@@ -44,4 +44,13 @@ async function listTags() {
   return Array.from(tagSet).sort();
 }
 
-module.exports = { addTag, removeTag, getSessionsByTag, listTags };
+async function renameTags(oldTag, newTag) {
+  const sessions = await getSessionsByTag(oldTag);
+  for (const { name, session } of sessions) {
+    session.tags = session.tags.map(t => (t === oldTag ? newTag : t));
+    await saveSession(name, session);
+  }
+  return sessions.length;
+}
+
+module.exports = { addTag, removeTag, getSessionsByTag, listTags, renameTags };
