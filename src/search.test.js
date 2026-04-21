@@ -42,8 +42,19 @@ test('searchByName is case-insensitive', () => {
   expect(results[0].name).toBe('personal');
 });
 
+test('searchByName returns empty array when no match', () => {
+  const results = searchByName('nonexistent');
+  expect(results).toHaveLength(0);
+});
+
 test('searchByUrl finds sessions with matching tab url', () => {
   const results = searchByUrl('github.com');
+  expect(results).toHaveLength(1);
+  expect(results[0].name).toBe('work');
+});
+
+test('searchByUrl is case-insensitive', () => {
+  const results = searchByUrl('GITHUB.COM');
   expect(results).toHaveLength(1);
   expect(results[0].name).toBe('work');
 });
@@ -62,4 +73,11 @@ test('searchAll matches across name, url, and title', () => {
 test('searchAll returns empty array when no match', () => {
   const results = searchAll('zzznomatch');
   expect(results).toHaveLength(0);
+});
+
+test('searchAll does not return duplicate sessions', () => {
+  // 'work' session matches both by name pattern and url; should only appear once
+  const results = searchAll('work');
+  const names = results.map(s => s.name);
+  expect(names).toEqual([...new Set(names)]);
 });
