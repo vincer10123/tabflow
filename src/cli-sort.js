@@ -34,6 +34,9 @@ Examples:
 `);
 }
 
+const VALID_TAB_FIELDS = ['title', 'url', 'date'];
+const VALID_SESSION_FIELDS = ['name', 'tabcount'];
+
 async function run(args) {
   if (args.includes('--help') || args.includes('-h')) {
     printHelp();
@@ -48,6 +51,11 @@ async function run(args) {
     const sessionName = args[1];
     if (!sessionName) {
       console.error('Error: session name required');
+      process.exit(1);
+    }
+
+    if (!VALID_TAB_FIELDS.includes(by)) {
+      console.error(`Error: invalid sort field "${by}" for tabs. Valid fields: ${VALID_TAB_FIELDS.join(', ')}`);
       process.exit(1);
     }
 
@@ -66,6 +74,11 @@ async function run(args) {
     console.log(`Sorted ${sorted.length} tabs in "${sessionName}" by ${by}${desc ? ' (desc)' : ''}.`);
 
   } else if (args[0] === 'sessions') {
+    if (!VALID_SESSION_FIELDS.includes(by)) {
+      console.error(`Error: invalid sort field "${by}" for sessions. Valid fields: ${VALID_SESSION_FIELDS.join(', ')}`);
+      process.exit(1);
+    }
+
     const sessions = await getAllSessions();
     let sorted;
     if (by === 'tabcount') sorted = sortSessionsByTabCount(sessions, desc);
