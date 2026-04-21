@@ -2,13 +2,23 @@ const { bookmarkTab, unbookmarkTab } = require('./bookmark');
 const { saveSession } = require('./storage');
 
 /**
- * Wraps session mutation functions with automatic bookmark persistence
+ * Wraps session mutation functions with automatic bookmark persistence.
+ * If the wrapped function throws, the error is propagated without saving.
  */
 function withBookmarkPersist(fn, sessionName) {
   return async function (...args) {
-    const result = await fn(...args);
+    let result;
+    try {
+      result = await fn(...args);
+    } catch (err) {
+      throw new Error(`Bookmark operation failed: ${err.message}`);
+    }
     if (result && result.tabs) {
-      await saveSession(sessionName, result);
+      try {
+        await saveSession(sessionName, result);
+      } catch (err) {
+        throw new Error(`Failed to persist session "${sessionName}": ${err.message}`);
+      }
     }
     return result;
   };
