@@ -47,4 +47,22 @@ function removeSession(name) {
   deleteSession(name);
 }
 
-module.exports = { createSession, getSession, getAllSessions, removeSession };
+/**
+ * Renames an existing session by copying it under the new name and deleting the old one.
+ * Throws if the source session doesn't exist or the target name is already taken.
+ */
+function renameSession(oldName, newName) {
+  if (!newName || typeof newName !== 'string' || newName.trim() === '') {
+    throw new Error('New session name must be a non-empty string');
+  }
+  const session = loadSession(oldName);
+  if (!session) throw new Error(`Session "${oldName}" not found`);
+  if (loadSession(newName.trim())) throw new Error(`Session "${newName.trim()}" already exists`);
+
+  const renamed = { ...session, name: newName.trim() };
+  saveSession(newName.trim(), renamed);
+  deleteSession(oldName);
+  return renamed;
+}
+
+module.exports = { createSession, getSession, getAllSessions, removeSession, renameSession };
