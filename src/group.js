@@ -38,6 +38,23 @@ function applyGroupOrder(session, groupKey, groupFn) {
   return { ...session, tabs: reordered };
 }
 
+/**
+ * Returns a summary of group sizes for a given grouping function.
+ * Useful for previewing how tabs will be grouped before committing.
+ *
+ * @param {object} session - The session object
+ * @param {function} groupFn - A grouping function (e.g. groupTabsByDomain)
+ * @returns {object} Map of group keys to tab counts
+ */
+function getGroupSummary(session, groupFn) {
+  const groups = groupFn(session);
+  const summary = {};
+  for (const [key, tabs] of Object.entries(groups)) {
+    summary[key] = tabs.length;
+  }
+  return summary;
+}
+
 async function groupSessionByDomain(name) {
   const session = await loadSession(name);
   if (!session) throw new Error(`Session "${name}" not found`);
@@ -58,6 +75,7 @@ module.exports = {
   groupTabsByDomain,
   groupTabsByTag,
   applyGroupOrder,
+  getGroupSummary,
   groupSessionByDomain,
   groupSessionByTag,
 };
