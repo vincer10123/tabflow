@@ -37,6 +37,14 @@ describe('moveTab', () => {
     await expect(moveTab('ghost', 0, 'personal')).rejects.toThrow('Session not found: ghost');
   });
 
+  it('throws if destination session not found', async () => {
+    const from = makeSession('work', [{ url: 'https://a.com', title: 'A' }]);
+    getSession.mockImplementation((name) =>
+      Promise.resolve(name === 'work' ? from : null)
+    );
+    await expect(moveTab('work', 0, 'ghost')).rejects.toThrow('Session not found: ghost');
+  });
+
   it('throws if tab index out of range', async () => {
     const from = makeSession('work', [{ url: 'https://a.com', title: 'A' }]);
     const to = makeSession('personal', []);
