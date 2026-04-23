@@ -70,10 +70,27 @@ async function batchTransformWhere(predicateFn, transformFn) {
   return batchTransform(matching, transformFn);
 }
 
+/**
+ * Summarize the results of a batch operation.
+ * Returns { total, succeeded, failed, errors } where errors is a list
+ * of { name, error } for each failed operation.
+ */
+function summarizeBatchResults(results) {
+  const succeeded = results.filter((r) => r.success);
+  const failed = results.filter((r) => !r.success);
+  return {
+    total: results.length,
+    succeeded: succeeded.length,
+    failed: failed.length,
+    errors: failed.map((r) => ({ name: r.name, error: r.error })),
+  };
+}
+
 module.exports = {
   batchTransform,
   batchDelete,
   batchAddTag,
   batchRemoveTag,
   batchTransformWhere,
+  summarizeBatchResults,
 };
