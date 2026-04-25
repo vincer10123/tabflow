@@ -61,4 +61,21 @@ function copyTabToSession(sourceSession, tabIndex, targetSession) {
   return { ...targetSession, tabs, updatedAt: new Date().toISOString() };
 }
 
-module.exports = { duplicateTab, duplicateTabInSession, copyTabToSession };
+/**
+ * Duplicate all tabs in a session, returning a new session with copies
+ * of every tab appended after their originals.
+ * Returns the updated session.
+ */
+function duplicateAllTabs(session) {
+  if (!session || !Array.isArray(session.tabs)) {
+    throw new Error('Invalid session');
+  }
+  const tabs = [];
+  session.tabs.forEach((tab, index) => {
+    tabs.push(tab);
+    tabs.push(duplicateTab(session, index));
+  });
+  return { ...session, tabs, updatedAt: new Date().toISOString() };
+}
+
+module.exports = { duplicateTab, duplicateTabInSession, copyTabToSession, duplicateAllTabs };
