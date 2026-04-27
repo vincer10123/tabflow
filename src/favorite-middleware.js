@@ -33,4 +33,15 @@ async function annotateFavorites(sessionName, tabs) {
   );
 }
 
-module.exports = { withFavoriteInfo, withFavoritesOnly, annotateFavorites };
+/**
+ * Partitions tabs into favorited and non-favorited groups.
+ * Returns { favorited, rest } without mutating the original array.
+ */
+async function partitionByFavorite(sessionName, tabs) {
+  const annotated = await annotateFavorites(sessionName, tabs);
+  const favorited = annotated.filter(t => t.isFavorited);
+  const rest = annotated.filter(t => !t.isFavorited);
+  return { favorited, rest };
+}
+
+module.exports = { withFavoriteInfo, withFavoritesOnly, annotateFavorites, partitionByFavorite };
