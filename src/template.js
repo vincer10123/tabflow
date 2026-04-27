@@ -77,4 +77,16 @@ function listTemplates() {
   return combined;
 }
 
-module.exports = { saveAsTemplate, instantiateTemplate, listTemplates, BUILT_IN_TEMPLATES };
+/**
+ * Delete a saved template by name.
+ * Built-in templates cannot be deleted.
+ */
+function deleteTemplate(templateName) {
+  if (BUILT_IN_TEMPLATES[templateName]) {
+    throw new Error(`Cannot delete built-in template "${templateName}"`);
+  }
+  const { deleteSession } = require('./storage');
+  deleteSession(`template__${templateName}`);
+}
+
+module.exports = { saveAsTemplate, instantiateTemplate, listTemplates, deleteTemplate, BUILT_IN_TEMPLATES };
