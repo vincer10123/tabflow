@@ -11,6 +11,8 @@ function getLimit(session) {
 
 /**
  * Set a tab limit on a session.
+ * @param {object} session - The session object.
+ * @param {number} max - Must be a positive integer.
  */
 function setLimit(session, max) {
   if (typeof max !== 'number' || max < 1) {
@@ -58,4 +60,14 @@ function trimToLimit(session) {
   return { ...session, tabs: tabs.slice(0, limit) };
 }
 
-module.exports = { getLimit, setLimit, clearLimit, isAtLimit, guardLimit, trimToLimit };
+/**
+ * Returns how many more tabs can be added before hitting the limit.
+ * Returns 0 if the session is already at or over the limit.
+ */
+function remainingCapacity(session) {
+  const tabs = session.tabs ?? [];
+  const limit = getLimit(session);
+  return Math.max(0, limit - tabs.length);
+}
+
+module.exports = { getLimit, setLimit, clearLimit, isAtLimit, guardLimit, trimToLimit, remainingCapacity };
