@@ -21,6 +21,19 @@ Examples:
 `);
 }
 
+/**
+ * Validates that a session name was provided, exits with an error if not.
+ * @param {string} sessionName - The session name argument from CLI
+ * @param {string} usage - Optional usage hint to display
+ */
+function requireSessionName(sessionName, usage) {
+  if (!sessionName) {
+    const msg = usage ? `Usage: ${usage}` : 'Session name required';
+    console.error(msg);
+    process.exit(1);
+  }
+}
+
 function run(args) {
   const [cmd, sessionName, ...rest] = args;
 
@@ -31,7 +44,8 @@ function run(args) {
 
   try {
     if (cmd === 'set') {
-      if (!sessionName || rest.length === 0) {
+      requireSessionName(sessionName, 'tabflow focus set <session> <domain,...>');
+      if (rest.length === 0) {
         console.error('Usage: tabflow focus set <session> <domain,...>');
         process.exit(1);
       }
@@ -40,12 +54,12 @@ function run(args) {
       console.log(`Focus mode set for "${sessionName}": ${domains.join(', ')}`);
 
     } else if (cmd === 'clear') {
-      if (!sessionName) { console.error('Session name required'); process.exit(1); }
+      requireSessionName(sessionName);
       clearFocusMode(sessionName);
       console.log(`Focus mode cleared for "${sessionName}"`);
 
     } else if (cmd === 'show') {
-      if (!sessionName) { console.error('Session name required'); process.exit(1); }
+      requireSessionName(sessionName);
       const domains = getFocusDomains(sessionName);
       if (!domains) {
         console.log(`No focus mode active for "${sessionName}"`);
@@ -54,7 +68,7 @@ function run(args) {
       }
 
     } else if (cmd === 'preview') {
-      if (!sessionName) { console.error('Session name required'); process.exit(1); }
+      requireSessionName(sessionName);
       const session = loadSession(sessionName);
       if (!session) { console.error(`Session "${sessionName}" not found`); process.exit(1); }
       const filtered = applyFocusFilter(session);
