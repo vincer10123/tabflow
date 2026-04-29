@@ -18,6 +18,16 @@ test('addNote appends a note to the session', async () => {
   expect(saveSession).toHaveBeenCalledWith('work', expect.objectContaining({ notes }));
 });
 
+test('addNote preserves existing notes', async () => {
+  const session = { ...mockSession(), notes: [{ text: 'existing', createdAt: '2024-01-01' }] };
+  loadSession.mockResolvedValue(session);
+  saveSession.mockResolvedValue();
+  const notes = await addNote('work', 'new note');
+  expect(notes).toHaveLength(2);
+  expect(notes[0].text).toBe('existing');
+  expect(notes[1].text).toBe('new note');
+});
+
 test('getNotes returns notes array', async () => {
   const session = { ...mockSession(), notes: [{ text: 'hi', createdAt: '2024-01-01' }] };
   loadSession.mockResolvedValue(session);
