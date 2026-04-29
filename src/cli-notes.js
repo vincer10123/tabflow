@@ -13,6 +13,17 @@ function printHelp() {
   console.log(`  clear <session>        Clear all notes from a session`);
 }
 
+/**
+ * Formats a note's createdAt timestamp into a short, readable string.
+ * Falls back to the raw value if parsing fails.
+ * @param {string} createdAt
+ * @returns {string}
+ */
+function formatDate(createdAt) {
+  const d = new Date(createdAt);
+  return isNaN(d.getTime()) ? createdAt : d.toLocaleString();
+}
+
 async function main() {
   if (!command || !sessionName) return printHelp();
 
@@ -26,7 +37,7 @@ async function main() {
     } else if (command === 'list') {
       const notes = await getNotes(sessionName);
       if (notes.length === 0) { console.log('No notes for this session.'); return; }
-      notes.forEach((n, i) => console.log(`[${i}] ${n.text}  (${n.createdAt})`));
+      notes.forEach((n, i) => console.log(`[${i}] ${n.text}  (${formatDate(n.createdAt)})`));
 
     } else if (command === 'remove') {
       const index = parseInt(rest[0], 10);
